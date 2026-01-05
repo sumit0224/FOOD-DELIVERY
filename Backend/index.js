@@ -15,22 +15,18 @@ const adminRoutes = require('./routes/adminRoutes');
 connectDB();
 
 // Middleware
-app.use(cors()); // Enable CORS for all routes
+app.use(cors(
+    {
+        origin: 'http://localhost:5173',
+        credentials: true,
+    }
+)); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Test route
 app.get('/', (req, res) => {
-    res.json({
-        message: "Food Delivery API is running",
-        version: "2.0.0",
-        endpoints: {
-            products: "/api/products",
-            orders: "/api/orders",
-            users: "/api/users",
-            admin: "/api/admin"
-        }
-    })
+   res.json({ message: 'API is running...' });
 })
 
 // API Routes
