@@ -1,6 +1,8 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+
 
 // @desc    Register a new user
 // @route   POST /api/users/register
@@ -46,7 +48,12 @@ const registerUser = async (req, res) => {
             process.env.JWT_SECRET || 'your-secret-key',
             { expiresIn: '30d' }
         );
-
+        res.cookie('token', token, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+        
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
@@ -116,10 +123,18 @@ const loginUser = async (req, res) => {
             process.env.JWT_SECRET || 'your-secret-key',
             { expiresIn: '30d' }
         );
+        res.cookie('token', token, {
+            httpOnly: true,
+           
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+       
 
         res.status(200).json({
             success: true,
             message: 'Login successful',
+            token,
             data: {
                 _id: user._id,
                 name: user.name,
@@ -127,8 +142,8 @@ const loginUser = async (req, res) => {
                 phone: user.phone,
                 address: user.address,
                 role: user.role,
-                token
             }
+            
         });
     } catch (error) {
         res.status(500).json({
@@ -143,29 +158,31 @@ const loginUser = async (req, res) => {
 // @route   GET /api/users/profile
 // @access  Private (User)
 const getUserProfile = async (req, res) => {
-    try {
-        // req.user is set by auth middleware
-        const user = await User.findById(req.user.id).select('-password');
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error fetching user profile',
-            error: error.message
-        });
+  try {
+    if (!req.user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+      },
+    });
+  } catch (error) {
+    console.error("GET PROFILE ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
+
 
 // @desc    Update user profile
 // @route   PUT /api/users/profile

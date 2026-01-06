@@ -1,7 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
+import api from "../../api/api";
 
 export default function Signup() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,15 +31,13 @@ export default function Signup() {
     setMessage("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/users/register",
+      const res = await api.post(
+        "users/register",
         formData
       );
 
       setMessage("✅ Account created successfully");
-      console.log(res.data);
 
-      // reset form
       setFormData({
         name: "",
         email: "",
@@ -42,9 +45,8 @@ export default function Signup() {
         phone: "",
         address: "",
       });
-    } catch (error) {
-      console.error(error);
-
+      navigate("/dashboard");
+    } catch (error) { 
       setMessage(
         error.response?.data?.message || "❌ Something went wrong"
       );
@@ -54,8 +56,18 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#FF5200] px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 relative">
+
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute top-5 left-5 flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-black"
+        >
+          <FaArrowLeft />
+          Back
+        </button>
+
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Create Account
         </h2>
@@ -76,7 +88,7 @@ export default function Signup() {
             onChange={handleChange}
             placeholder="Full Name"
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
           {/* Email */}
@@ -87,7 +99,7 @@ export default function Signup() {
             onChange={handleChange}
             placeholder="Email"
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
           {/* Password */}
@@ -98,7 +110,7 @@ export default function Signup() {
             onChange={handleChange}
             placeholder="Password"
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
           {/* Phone */}
@@ -109,7 +121,7 @@ export default function Signup() {
             onChange={handleChange}
             placeholder="Phone Number"
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
           {/* Address */}
@@ -120,24 +132,26 @@ export default function Signup() {
             placeholder="Address"
             rows="3"
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            className="w-full px-4 py-3 border rounded-lg outline-none resize-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
           {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-300 disabled:opacity-50"
+            className="w-full bg-[#FF5200] hover:bg-[#e64a00] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
           >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm text-gray-500 mt-5">
           Already have an account?{" "}
-          <span className="text-blue-600 cursor-pointer hover:underline">
-            Login
-          </span>
+          <Link to="/login">
+            <span className="text-[#FF5200] font-semibold cursor-pointer hover:underline">
+              Login
+            </span>
+          </Link>
         </p>
       </div>
     </div>

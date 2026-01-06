@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const connectDB = require('./config/db');
+const cookieParser = require('cookie-parser');
 
 // Import routes
 const productRoutes = require('./routes/productRoutes');
@@ -15,6 +16,7 @@ const adminRoutes = require('./routes/adminRoutes');
 connectDB();
 
 // Middleware
+app.use(cookieParser());
 app.use(cors(
     {
         origin: 'http://localhost:5173',
