@@ -1,38 +1,49 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
 import { FaUser, FaEnvelope } from "react-icons/fa";
 
 export default function UserDashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
       try {
-        const token = localStorage.getItem("token");
+        const res = await api.get("/users/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        const res = await axios.get(
-          "http://localhost:5000/api/users/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(res.data.user);
-
-        setUser(res.data.user);
-        
+        if (res.data && res.data.user) {
+          setUser(res.data.user);
+        } else {
+          throw new Error("User data not found");
+        }
       } catch (err) {
-        setError("Failed to load user data");
+        console.error("Dashboard Error:", err);
+        setError(err.response?.data?.message || "Failed to load user data");
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchUser();
-  }, []);
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -50,6 +61,14 @@ export default function UserDashboard() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600">
+        User not found.
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-8">
       <div className="max-w-5xl mx-auto">
@@ -57,10 +76,10 @@ export default function UserDashboard() {
         {/* Header */}
         <div className="bg-[#FF5200] text-white rounded-2xl p-6 mb-6">
           <h1 className="text-2xl font-bold">
-            Welcome, {user.email} 👋
+            Welcome, {user.name} 👋
           </h1>
-          <p className="text-sm mt-1">
-            Manage your account & orders
+          <p className="text-sm mt-1 text-black">
+            Manage your account & orders 
           </p>
         </div>
 
@@ -97,6 +116,7 @@ export default function UserDashboard() {
               Browse Restaurants
             </button>
           </div>
+          
 
         </div>
       </div>

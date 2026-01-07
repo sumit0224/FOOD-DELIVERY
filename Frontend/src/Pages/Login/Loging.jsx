@@ -41,7 +41,7 @@ export default function Login() {
 
       localStorage.setItem("token", res.data.token);
       setMessage(`login successful`);  
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       setMessage(
         error.response?.data?.message || "❌ Invalid email or password"

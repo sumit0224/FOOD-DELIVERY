@@ -27,6 +27,7 @@ export default function AdminRegister() {
     try {
       await axios.post("http://localhost:5000/api/admin/register", formData);
       setMessage("✅ Admin registered successfully");
+      navigate("/admin-dashboard");
       setFormData({ name: "", email: "", password: "" });
     } catch (error) {
       setMessage(error.response?.data?.message || "❌ Something went wrong");

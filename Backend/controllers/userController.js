@@ -57,6 +57,7 @@ const registerUser = async (req, res) => {
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
+            token,
             data: {
                 _id: user._id,
                 name: user.name,
@@ -64,7 +65,7 @@ const registerUser = async (req, res) => {
                 phone: user.phone,
                 address: user.address,
                 role: user.role,
-                token
+               
             }
         });
     } catch (error) {
@@ -154,12 +155,24 @@ const loginUser = async (req, res) => {
     }
 };
 
+
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private (User)
 const getUserProfile = async (req, res) => {
   try {
-    if (!req.user) {
+    
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
+    // Fetch user from DB
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -168,12 +181,9 @@ const getUserProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      user: {
-        id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-      },
+      user, 
     });
+
   } catch (error) {
     console.error("GET PROFILE ERROR:", error);
     res.status(500).json({
@@ -182,6 +192,7 @@ const getUserProfile = async (req, res) => {
     });
   }
 };
+
 
 
 // @desc    Update user profile
@@ -231,6 +242,15 @@ const updateUserProfile = async (req, res) => {
         });
     }
 };
+
+const logoutUser = async (req, res)=>{
+    try {
+        
+        
+    } catch (error) {
+        
+    }
+}
 
 module.exports = {
     registerUser,

@@ -45,7 +45,7 @@ export default function Signup() {
         phone: "",
         address: "",
       });
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) { 
       setMessage(
         error.response?.data?.message || "❌ Something went wrong"
