@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
         type: Number,
         required: true,
         unique: true
-        
+
     },
     address: {
         type: String,
@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    otp: {
+        type: String,
+    },
+    otpExpires: {
+        type: Date,
     }
 },
     {
@@ -41,4 +47,4 @@ const userSchema = new mongoose.Schema({
     })
 
 
- module.exports = mongoose.model('User', userSchema);   
+module.exports = mongoose.model('User', userSchema);   

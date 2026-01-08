@@ -40,7 +40,7 @@ export default function Login() {
       );
 
       localStorage.setItem("token", res.data.token);
-      setMessage(`login successful`);  
+      setMessage(`login successful`);
       navigate("/");
     } catch (error) {
       setMessage(
@@ -109,9 +109,11 @@ export default function Login() {
         </form>
 
         <div className="flex justify-between text-sm text-gray-500 mt-5">
-          <span className="cursor-pointer hover:underline">
-            Forgot password?
-          </span>
+          <Link to="/forgot-password">
+            <span className="cursor-pointer hover:underline">
+              Forgot password?
+            </span>
+          </Link>
 
           <Link to="/signup">
             <span className="text-[#FF5200] font-semibold cursor-pointer hover:underline">

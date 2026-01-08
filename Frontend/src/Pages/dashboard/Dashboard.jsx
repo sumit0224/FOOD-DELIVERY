@@ -79,7 +79,7 @@ export default function UserDashboard() {
             Welcome, {user.name} 👋
           </h1>
           <p className="text-sm mt-1 text-black">
-            Manage your account & orders 
+            Manage your account & orders
           </p>
         </div>
 
@@ -112,11 +112,14 @@ export default function UserDashboard() {
               You have no recent orders 🍔
             </p>
 
-            <button className="mt-4 bg-[#FF5200] text-white px-4 py-2 rounded-lg">
+            <button
+              onClick={() => navigate("/")}
+              className="mt-4 bg-[#FF5200] text-white px-4 py-2 rounded-lg hover:bg-[#e64a00] transition"
+            >
               Browse Restaurants
             </button>
           </div>
-          
+
 
         </div>
       </div>
