@@ -14,6 +14,7 @@ import Checkout from "./Pages/Checkout"
 import ForgotPassword from "./Pages/Login/ForgotPassword"
 import ResetPassword from "./Pages/Login/ResetPassword"
 import AdminUsers from "./Pages/dashboard/AdminUsers"
+import Footer from "./components/Footer"
 
 import { CartProvider } from "./context/CartContext"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -41,6 +42,7 @@ const App = () => {
           <Route path="/admin/create-product" element={<CreateProduct />} />
           <Route path="/admin/edit-product/:id" element={<EditProduct />} />
         </Routes>
+        <Footer />
       </Router>
     </CartProvider>
   )

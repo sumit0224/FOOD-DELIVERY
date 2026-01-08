@@ -28,13 +28,9 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // For basic implementation, using a default user ID
-        // In production, this would come from authenticated user session
-        const userId = req.body.userId || '507f1f77bcf86cd799439011';
-
         // Create order
         const order = await Order.create({
-            user: userId,
+            user: req.user.id,
             orderItems,
             shippingAddress,
             paymentMethod,
@@ -150,9 +146,30 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+// @desc    Get logged in user orders
+// @route   GET /api/orders/myorders
+// @access  User
+const getMyOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
+        res.status(200).json({
+            success: true,
+            count: orders.length,
+            data: orders
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching my orders',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
-    updateOrderStatus
+    updateOrderStatus,
+    getMyOrders
 };

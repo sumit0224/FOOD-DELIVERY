@@ -3,7 +3,36 @@ import Navbar from "../Navbar";
 import { FaLocationDot, FaChevronDown } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 
-const Header = () => {
+const Header = ({ setSearchTerm }) => {
+  const [location, setLocation] = React.useState("");
+
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
+            );
+            const data = await response.json();
+            const city = data.address.city || data.address.town || data.address.village || "Unknown Location";
+            setLocation(city);
+          } catch (error) {
+            console.error("Error fetching location:", error);
+            setLocation("Could not detect location");
+          }
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setLocation("Geolocation failed");
+        }
+      );
+    } else {
+      setLocation("Geolocation is not supported");
+    }
+  };
+
   return (
     <div className="w-full bg-[#FF5200] relative overflow-hidden">
       <Navbar />
@@ -32,13 +61,19 @@ const Header = () => {
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 px-4 mt-8">
         {/* Location */}
         <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 w-full md:w-[320px]">
-          <FaLocationDot className="text-[#FF5200] text-xl" />
+          <FaLocationDot
+            className="text-[#FF5200] text-xl cursor-pointer hover:scale-110 transition-transform"
+            onClick={getUserLocation}
+            title="Detect my location"
+          />
           <input
             type="text"
             placeholder="Enter your delivery location"
             className="w-full outline-none placeholder:text-zinc-500 font-semibold text-sm"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
           />
-          <FaChevronDown />
+          <FaChevronDown className="text-gray-400" />
         </div>
 
         {/* Search */}
@@ -47,6 +82,7 @@ const Header = () => {
             type="text"
             placeholder="Search for restaurants, items or more"
             className="w-full outline-none placeholder:text-zinc-500 font-semibold text-sm"
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <IoIosSearch className="text-xl" />
         </div>
