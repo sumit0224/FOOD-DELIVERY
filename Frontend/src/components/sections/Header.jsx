@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../Navbar";
+
 import { FaLocationDot, FaChevronDown } from "react-icons/fa6";
 import { IoIosSearch } from "react-icons/io";
 
@@ -35,9 +35,9 @@ const Header = ({ setSearchTerm }) => {
 
   return (
     <div className="w-full bg-[#FF5200] relative overflow-hidden">
-      <Navbar />
 
-      {/* Side Images (hidden on small screens) */}
+
+
       <img
         src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/portal/testing/seo-home/Veggies_new.png"
         alt=""
@@ -49,7 +49,7 @@ const Header = ({ setSearchTerm }) => {
         className="hidden lg:block w-[180px] h-[450px] absolute top-24 right-0"
       />
 
-      {/* Heading */}
+
       <div className="flex justify-center px-4 mt-16 md:mt-24">
         <h1 className="text-white font-bold text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-snug">
           Order food & groceries. Discover <br className="hidden sm:block" />
@@ -57,9 +57,9 @@ const Header = ({ setSearchTerm }) => {
         </h1>
       </div>
 
-      {/* Search Section */}
+
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 px-4 mt-8">
-        {/* Location */}
+
         <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 w-full md:w-[320px]">
           <FaLocationDot
             className="text-[#FF5200] text-xl cursor-pointer hover:scale-110 transition-transform"
@@ -76,7 +76,7 @@ const Header = ({ setSearchTerm }) => {
           <FaChevronDown className="text-gray-400" />
         </div>
 
-        {/* Search */}
+
         <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 w-full md:w-[520px]">
           <input
             type="text"
@@ -88,7 +88,7 @@ const Header = ({ setSearchTerm }) => {
         </div>
       </div>
 
-      {/* Banners */}
+
       <div className="flex flex-wrap justify-center gap-4 mt-10 px-4 pb-10">
         <img
           src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/MERCHANDISING_BANNERS/IMAGES/MERCH/2024/7/23/ec86a309-9b06-48e2-9adc-35753f06bc0a_Food3BU.png"

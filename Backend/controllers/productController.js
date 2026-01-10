@@ -1,21 +1,19 @@
 const Product = require('../models/productModel');
 
-// @desc    Add a new product (Admin only)
-// @route   POST /api/products
-// @access  Admin
+
 const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, stock, imageUrl } = req.body;
 
-        // Validate required fields
+
         if (!name || !description || !price || !category || !stock || !imageUrl) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Please provide all required fields' 
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide all required fields'
             });
         }
 
-        // Create new product
+
         const product = await Product.create({
             name,
             description,
@@ -39,9 +37,7 @@ const addProduct = async (req, res) => {
     }
 };
 
-// @desc    Get all products
-// @route   GET /api/products
-// @access  Public
+
 const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find({});
@@ -60,9 +56,7 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-// @desc    Get single product by ID
-// @route   GET /api/products/:id
-// @access  Public
+
 const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -87,9 +81,7 @@ const getProductById = async (req, res) => {
     }
 };
 
-// @desc    Update product (Admin only)
-// @route   PUT /api/products/:id
-// @access  Admin
+
 const updateProduct = async (req, res) => {
     try {
         const { name, description, price, category, stock, imageUrl } = req.body;
@@ -103,7 +95,7 @@ const updateProduct = async (req, res) => {
             });
         }
 
-        // Update product fields
+
         product.name = name || product.name;
         product.description = description || product.description;
         product.price = price || product.price;
@@ -127,9 +119,7 @@ const updateProduct = async (req, res) => {
     }
 };
 
-// @desc    Delete product (Admin only)
-// @route   DELETE /api/products/:id
-// @access  Admin
+
 const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);

@@ -25,7 +25,11 @@ export default function AdminRegister() {
     setMessage("");
 
     try {
-      await axios.post("http://localhost:5000/api/admin/register", formData);
+      const res = await axios.post("http://localhost:5000/api/admin/register", formData);
+
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", "admin");
+
       setMessage("✅ Admin registered successfully");
       navigate("/admin-dashboard");
       setFormData({ name: "", email: "", password: "" });
@@ -40,7 +44,7 @@ export default function AdminRegister() {
     <div className="min-h-screen flex items-center justify-center bg-[#FF5200] px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 relative">
 
-        {/* Back */}
+
         <button
           onClick={() => navigate(-1)}
           className="absolute top-5 left-5 flex items-center gap-2 text-sm font-semibold text-gray-600"

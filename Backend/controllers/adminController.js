@@ -2,14 +2,12 @@ const Admin = require('../models/adminModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// @desc    Register a new admin
-// @route   POST /api/admin/register
-// @access  Public (In production, this should be protected)
+
 const registerAdmin = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Validate required fields
+
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -17,7 +15,7 @@ const registerAdmin = async (req, res) => {
             });
         }
 
-        // Check if admin already exists
+
         const adminExists = await Admin.findOne({ email });
         if (adminExists) {
             return res.status(400).json({
@@ -26,11 +24,11 @@ const registerAdmin = async (req, res) => {
             });
         }
 
-        // Hash password
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create admin
+
         const admin = await Admin.create({
             name,
             email,
@@ -38,7 +36,7 @@ const registerAdmin = async (req, res) => {
             role: 'admin'
         });
 
-        // Generate JWT token
+
         const token = jwt.sign(
             { id: admin._id, role: admin.role },
             process.env.JWT_SECRET || 'your-secret-key',
@@ -66,14 +64,12 @@ const registerAdmin = async (req, res) => {
     }
 };
 
-// @desc    Login admin
-// @route   POST /api/admin/login
-// @access  Public
+
 const loginAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate required fields
+
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -81,7 +77,7 @@ const loginAdmin = async (req, res) => {
             });
         }
 
-        // Check if admin exists
+
         const admin = await Admin.findOne({ email });
         if (!admin) {
             return res.status(401).json({
@@ -90,7 +86,7 @@ const loginAdmin = async (req, res) => {
             });
         }
 
-        // Verify password
+
         const isPasswordValid = await bcrypt.compare(password, admin.password);
         if (!isPasswordValid) {
             return res.status(401).json({
@@ -99,7 +95,7 @@ const loginAdmin = async (req, res) => {
             });
         }
 
-        // Generate JWT token
+
         const token = jwt.sign(
             { id: admin._id, role: admin.role },
             process.env.JWT_SECRET || 'your-secret-key',
@@ -127,12 +123,10 @@ const loginAdmin = async (req, res) => {
     }
 };
 
-// @desc    Get admin profile
-// @route   GET /api/admin/profile
-// @access  Private (Admin)
+
 const getAdminProfile = async (req, res) => {
     try {
-        // req.user is set by auth middleware
+
         const admin = await Admin.findById(req.user.id).select('-password');
 
         if (!admin) {
@@ -155,9 +149,7 @@ const getAdminProfile = async (req, res) => {
     }
 };
 
-// @desc    Get all users (Admin only)
-// @route   GET /api/admin/users
-// @access  Private (Admin)
+
 const getAllUsers = async (req, res) => {
     try {
         const User = require('../models/userModel');

@@ -6,38 +6,38 @@ const app = express();
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 
-// Import routes
+
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-//connect database
+
 connectDB();
 
-// Middleware
+
 app.use(cookieParser());
 app.use(cors(
     {
         origin: 'http://localhost:5173',
         credentials: true,
     }
-)); // Enable CORS for all routes
-app.use(express.json()); // Parse JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Test route
+
 app.get('/', (req, res) => {
-   res.json({ message: 'API is running...' });
+    res.json({ message: 'API is running...' });
 })
 
-// API Routes
-app.use('/api/products', productRoutes); // Product routes
-app.use('/api/orders', orderRoutes); // Order routes
-app.use('/api/users', userRoutes); // User authentication routes
-app.use('/api/admin', adminRoutes); // Admin authentication routes
 
-// Error handling middleware
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
+
+
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -47,6 +47,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(process.env.PORT, () => {
-    console.log(`server running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`server running on port ${PORT}`);
 })

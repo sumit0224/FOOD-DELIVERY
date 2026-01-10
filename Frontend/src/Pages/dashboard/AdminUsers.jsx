@@ -52,7 +52,7 @@ export default function AdminUsers() {
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
+
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div className="flex items-center gap-4">
                         <Link to="/admin-dashboard" className="text-gray-500 hover:text-[#FF5200] transition-colors">
@@ -61,7 +61,7 @@ export default function AdminUsers() {
                         <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
                     </div>
 
-                    {/* Search Bar */}
+
                     <div className="relative w-full md:w-96">
                         <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
@@ -74,7 +74,7 @@ export default function AdminUsers() {
                     </div>
                 </div>
 
-                {/* Users Table */}
+
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">

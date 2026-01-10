@@ -32,7 +32,7 @@ export default function Cart() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Cart Items */}
+
                     <div className="lg:col-span-2 space-y-4">
                         {cartItems.map((item) => (
                             <div
@@ -84,7 +84,7 @@ export default function Cart() {
                         </button>
                     </div>
 
-                    {/* Checkout Summary */}
+
                     <div className="lg:col-span-1">
                         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 sticky top-4">
                             <h2 className="text-xl font-bold text-gray-800 mb-6">Bill Details</h2>

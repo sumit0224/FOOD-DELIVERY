@@ -4,14 +4,12 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
 
-// @desc    Register a new user
-// @route   POST /api/users/register
-// @access  Public
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, phone, address } = req.body;
 
-        // Validate required fields
+
         if (!name || !email || !password || !phone || !address) {
             return res.status(400).json({
                 success: false,
@@ -19,7 +17,7 @@ const registerUser = async (req, res) => {
             });
         }
 
-        // Check if user already exists
+
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({
@@ -28,11 +26,11 @@ const registerUser = async (req, res) => {
             });
         }
 
-        // Hash password
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create user
+
         const user = await User.create({
             name,
             email,
@@ -42,7 +40,7 @@ const registerUser = async (req, res) => {
             role: 'customer'
         });
 
-        // Generate JWT token
+
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET || 'your-secret-key',
@@ -77,14 +75,12 @@ const registerUser = async (req, res) => {
     }
 };
 
-// @desc    Login user
-// @route   POST /api/users/login
-// @access  Public
+
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate required fields
+
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -92,7 +88,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Check if user exists
+
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({
@@ -101,7 +97,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Check if user is active
+
         if (!user.isActive) {
             return res.status(401).json({
                 success: false,
@@ -109,7 +105,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Verify password
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({
@@ -118,7 +114,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // Generate JWT token
+
         const token = jwt.sign(
             { id: user._id, role: user.role },
             process.env.JWT_SECRET || 'your-secret-key',
@@ -156,9 +152,7 @@ const loginUser = async (req, res) => {
 };
 
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-// @access  Private (User)
+
 const getUserProfile = async (req, res) => {
     try {
 
@@ -169,7 +163,7 @@ const getUserProfile = async (req, res) => {
             });
         }
 
-        // Fetch user from DB
+
         const user = await User.findById(req.user.id).select("-password");
 
         if (!user) {
@@ -195,9 +189,7 @@ const getUserProfile = async (req, res) => {
 
 
 
-// @desc    Update user profile
-// @route   PUT /api/users/profile
-// @access  Private (User)
+
 const updateUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -209,12 +201,12 @@ const updateUserProfile = async (req, res) => {
             });
         }
 
-        // Update fields
+
         user.name = req.body.name || user.name;
         user.phone = req.body.phone || user.phone;
         user.address = req.body.address || user.address;
 
-        // Update password if provided
+
         if (req.body.password) {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(req.body.password, salt);
@@ -243,9 +235,7 @@ const updateUserProfile = async (req, res) => {
     }
 };
 
-// @desc    Logout user
-// @route   POST /api/users/logout
-// @access  Public
+
 const logoutUser = (req, res) => {
     res.cookie('token', '', {
         httpOnly: true,
@@ -254,9 +244,7 @@ const logoutUser = (req, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// @desc    Forgot Password - Send OTP
-// @route   POST /api/users/forgot-password
-// @access  Public
+
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
@@ -266,35 +254,29 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Generate OTP
-        // In production, use a random generator. For dev/demo, use 1234 or random.
-        // const otp = Math.floor(1000 + Math.random() * 9000).toString();
-        const otp = '1234'; // Fixed for demonstration as requested
 
-        // Set expiry to 10 minutes
+
+
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
         user.otp = otp;
         user.otpExpires = otpExpires;
         await user.save();
 
-        // In a real app, send email here using nodemailer
+
         console.log(`OTP for ${email}: ${otp}`);
 
         res.status(200).json({
             success: true,
             message: 'OTP sent to email',
-            // Return OTP in dev mode for convenience if needed, or check console
-            devOtp: otp
+
         });
     } catch (error) {
         res.status(500).json({ message: 'Error sending OTP', error: error.message });
     }
 };
 
-// @desc    Verify OTP
-// @route   POST /api/users/verify-otp
-// @access  Public
+
 const verifyOtp = async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -314,9 +296,7 @@ const verifyOtp = async (req, res) => {
     }
 };
 
-// @desc    Reset Password
-// @route   POST /api/users/reset-password
-// @access  Public
+
 const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
@@ -331,11 +311,11 @@ const resetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Invalid or expired OTP' });
         }
 
-        // Hash new password
+
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
 
-        // Clear OTP
+
         user.otp = undefined;
         user.otpExpires = undefined;
         await user.save();
@@ -346,9 +326,7 @@ const resetPassword = async (req, res) => {
     }
 };
 
-// @desc    Get all users (Admin only)
-// @route   GET /api/users
-// @access  Admin
+
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}).select('-password').sort({ createdAt: -1 });

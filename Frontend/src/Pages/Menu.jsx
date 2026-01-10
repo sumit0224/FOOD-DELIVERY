@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/api';
-import Navbar from '../components/Navbar';
+
 import { useCart } from '../context/CartContext';
 import { FaPlus, FaMinus, FaSearch, FaFilter } from 'react-icons/fa';
 
@@ -76,7 +76,7 @@ const Menu = () => {
 
     return (
         <div className="bg-gray-50 min-h-screen">
-            <Navbar />
+
 
             <div className="bg-white shadow-sm sticky top-[80px] z-40">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">

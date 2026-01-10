@@ -4,6 +4,7 @@ import { FaMapMarkerAlt, FaCreditCard, FaArrowLeft } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
 import api from "../api/api";
 
+
 export default function Checkout() {
     const { cartItems, cartTotal, clearCart } = useCart();
     const navigate = useNavigate();
@@ -12,16 +13,17 @@ export default function Checkout() {
         street: "",
         city: "",
         postalCode: "",
+
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // Check for authentication
+
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) {
             alert("You must be logged in to place an order.");
-            navigate("/login");
+            navigate("/", { state: { openLogin: true } });
         }
     }, [navigate]);
 
@@ -52,7 +54,7 @@ export default function Checkout() {
                 product: item._id
             }));
 
-            // Validate orderItems
+
             if (orderItems.some(item => !item.product)) {
                 throw new Error("Invalid cart items: Missing product ID.");
             }
@@ -70,7 +72,7 @@ export default function Checkout() {
                 itemsPrice: cartTotal,
             };
 
-            console.log("Sending Order Payload:", payload);
+
 
             await api.post("orders", payload, {
                 headers: {
@@ -80,7 +82,7 @@ export default function Checkout() {
 
             clearCart();
             alert("Order placed successfully!");
-            navigate("/"); // Or to an /orders page if it existed
+            navigate("/");
         } catch (err) {
             console.error("Order Creation Error:", err);
             const responseData = err.response?.data;

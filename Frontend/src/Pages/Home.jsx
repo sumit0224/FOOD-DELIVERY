@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/sections/Header';
 import api from '../api/api';
-import Navbar from '../components/Navbar'; // Assuming we want navbar here too? Actually Header has it? No, Header is just the hero part. 
-// Wait, the previous Home had Header component which might contain Navbar logic or just the top part.
-// Let's check Header later. For now, following the pattern of Menu/About/Contact, I should probably put Navbar if Header doesn't have it.
-// Looking at previous Home.jsx, it imported Header.
+
 import { useCart } from '../context/CartContext';
 import { FaPlus, FaMinus, FaArrowRight, FaStar } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -34,7 +31,7 @@ const Home = () => {
     return item ? item.quantity : 0;
   };
 
-  // Hardcoded categories for display
+
   const categories = [
     { name: "Burger", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
     { name: "Pizza", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
@@ -43,14 +40,14 @@ const Home = () => {
     { name: "Main Course", image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
   ];
 
-  // Get random "Popular" items (just taking first 4 for now)
+
   const popularItems = products.slice(0, 8);
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header /> {/* Header component typically handles the top hero section */}
+      <Header />
 
-      {/* Categories Section */}
+
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800">What's on your mind?</h2>
@@ -68,7 +65,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Popular Items Section */}
+
       <div className="max-w-7xl mx-auto px-4 py-8 mb-12">
         <div className="flex justify-between items-end mb-8">
           <div>

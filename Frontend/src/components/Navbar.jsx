@@ -2,28 +2,31 @@ import React, { useEffect, useState } from "react";
 import { MdArrowOutward } from "react-icons/md";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FaUserCircle, FaShoppingCart } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import AuthModal from "./Auth/AuthModal";
+import ProfileDrawer from "./Layout/ProfileDrawer";
+import api from "../api/api";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const { cartCount } = useCart();
 
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showProfileDrawer, setShowProfileDrawer] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [location, setLocation] = useState("Detecting...");
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [manualLocation, setManualLocation] = useState("");
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    };
+  const locationHook = useLocation();
 
+  useEffect(() => {
     checkAuth();
     window.addEventListener("storage", checkAuth);
-
 
     const savedLocation = localStorage.getItem("userLocation");
     if (savedLocation) {
@@ -32,8 +35,58 @@ const Navbar = () => {
       getUserLocation();
     }
 
+
+    if (locationHook.state?.openLogin) {
+      setShowAuthModal(true);
+
+    }
+
     return () => window.removeEventListener("storage", checkAuth);
-  }, []);
+  }, [locationHook]);
+
+  const checkAuth = async () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+
+    if (token) {
+      if (!isLoggedIn) setIsLoggedIn(true);
+
+      fetchUserProfile();
+    } else {
+      setIsLoggedIn(false);
+      setCurrentUser(null);
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+
+      const res = await api.get("users/profile");
+      setCurrentUser(res.data.user);
+    } catch (error) {
+      console.error("Failed to fetch profile", error);
+
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userLocation");
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    window.location.href = "/";
+  };
+
+  const handleLoginSuccess = (userData) => {
+    setIsLoggedIn(true);
+    setCurrentUser(userData);
+    if (!userData) fetchUserProfile();
+  };
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
@@ -41,7 +94,6 @@ const Navbar = () => {
         async (position) => {
           const { latitude, longitude } = position.coords;
           try {
-
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
             );
@@ -78,7 +130,6 @@ const Navbar = () => {
     <>
       <nav className="w-full h-[80px] text-white flex items-center justify-between px-4 sm:px-8 lg:px-20 sticky top-0 z-50 bg-[#FF5200] shadow-md">
         <div className="flex items-center gap-8">
-
           <div className="logo cursor-pointer">
             <Link to="/">
               <img
@@ -88,7 +139,6 @@ const Navbar = () => {
               />
             </Link>
           </div>
-
 
           <div className="hidden md:flex items-center gap-2 text-white cursor-pointer hover:bg-white/10 p-2 rounded-lg transition" onClick={() => setShowLocationModal(true)}>
             <span className="font-bold border-b-2 border-white pb-0.5" title="Change Location">
@@ -100,9 +150,7 @@ const Navbar = () => {
           </div>
         </div>
 
-
         <ul className="hidden md:flex items-center gap-8 text-[16px] font-semibold">
-
           <li className="cursor-pointer hover:text-gray-100 transition">
             <Link to="/">Home</Link>
           </li>
@@ -130,31 +178,34 @@ const Navbar = () => {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
+
+              <li
+                className="flex items-center gap-2 cursor-pointer hover:text-gray-100"
+                onClick={() => setShowProfileDrawer(true)}
+              >
+                <FaUserCircle className="text-2xl" />
+                <span>{currentUser?.name || "User"}</span>
+              </li>
+
+
               <Link to="/dashboard">
-                <li className="flex items-center gap-2 cursor-pointer hover:text-gray-100">
-                  <FaUserCircle className="text-2xl" />
-                  <span>User</span>
-                </li>
+                <li className="cursor-pointer hover:text-gray-100">Orders</li>
               </Link>
+
               <li
                 className="cursor-pointer hover:text-red-100 text-sm font-normal bg-white/20 px-3 py-1 rounded-md transition"
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("role");
-                  localStorage.removeItem("userLocation");
-                  setIsLoggedIn(false);
-                  window.location.href = "/login";
-                }}
+                onClick={handleLogout}
               >
                 Logout
               </li>
             </div>
           ) : (
-            <Link to="/login">
-              <li className="px-6 py-2 bg-black text-white rounded-lg cursor-pointer hover:bg-gray-800 transition shadow-lg">
-                Sign In
-              </li>
-            </Link>
+            <li
+              className="px-6 py-2 bg-black text-white rounded-lg cursor-pointer hover:bg-gray-800 transition shadow-lg"
+              onClick={() => setShowAuthModal(true)}
+            >
+              Sign In
+            </li>
           )}
         </ul>
 
@@ -166,11 +217,9 @@ const Navbar = () => {
           {open ? <HiX /> : <HiMenu />}
         </button>
 
-
         {open && (
           <div className="absolute top-[80px] left-0 w-full bg-[#FF5200] z-50 md:hidden shadow-xl border-t border-white/20">
             <ul className="flex flex-col gap-6 px-6 py-8 text-[16px] font-bold text-white">
-
               <li className="flex flex-col gap-1 border-b border-white/20 pb-4" onClick={() => { setShowLocationModal(true); setOpen(false); }}>
                 <span className="text-sm opacity-80 uppercase tracking-wider">Delivering to</span>
                 <div className="flex items-center gap-2">
@@ -188,46 +237,54 @@ const Navbar = () => {
                 <li className="flex items-center gap-2 w-fit">
                   <FaShoppingCart className="text-2xl" />
                   <span>Cart</span>
-                  {cartCount > 0 && (
-                    <span className="bg-white text-[#FF5200] text-xs font-bold rounded-full px-2 py-0.5 ml-2">
-                      {cartCount} items
-                    </span>
-                  )}
                 </li>
               </Link>
 
               {isLoggedIn ? (
                 <>
+                  <li
+                    className="flex items-center gap-2 w-fit"
+                    onClick={() => { setShowProfileDrawer(true); setOpen(false); }}
+                  >
+                    <FaUserCircle className="text-2xl" />
+                    <span>Profile</span>
+                  </li>
                   <Link to="/dashboard" onClick={() => setOpen(false)}>
-                    <li className="flex items-center gap-2 w-fit">
-                      <FaUserCircle className="text-2xl" />
-                      <span>Profile</span>
-                    </li>
+                    <li>My Orders</li>
                   </Link>
                   <li
                     className="flex items-center gap-2 w-fit cursor-pointer text-red-100 hover:text-white"
-                    onClick={() => {
-                      localStorage.removeItem("token");
-                      localStorage.removeItem("role");
-                      setOpen(false);
-                      setIsLoggedIn(false);
-                      window.location.href = "/login";
-                    }}
+                    onClick={() => { handleLogout(); setOpen(false); }}
                   >
                     <span>Logout</span>
                   </li>
                 </>
               ) : (
-                <Link to="/login" onClick={() => setOpen(false)}>
-                  <li className="px-4 py-2 bg-black rounded-lg w-fit text-center">
-                    Sign In
-                  </li>
-                </Link>
+                <li
+                  className="px-4 py-2 bg-black rounded-lg w-fit text-center"
+                  onClick={() => { setShowAuthModal(true); setOpen(false); }}
+                >
+                  Sign In
+                </li>
               )}
             </ul>
           </div>
         )}
       </nav>
+
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      <ProfileDrawer
+        isOpen={showProfileDrawer}
+        onClose={() => setShowProfileDrawer(false)}
+        user={currentUser}
+        onUpdateUser={setCurrentUser}
+      />
 
 
       {showLocationModal && (

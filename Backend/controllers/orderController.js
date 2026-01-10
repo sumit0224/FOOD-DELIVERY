@@ -1,9 +1,7 @@
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
 
-// @desc    Create a new order (User)
-// @route   POST /api/orders
-// @access  User
+
 const createOrder = async (req, res) => {
     try {
         const {
@@ -13,7 +11,7 @@ const createOrder = async (req, res) => {
             itemsPrice
         } = req.body;
 
-        // Validate required fields
+
         if (!orderItems || orderItems.length === 0) {
             return res.status(400).json({
                 success: false,
@@ -28,7 +26,7 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // Create order
+
         const order = await Order.create({
             user: req.user.id,
             orderItems,
@@ -44,7 +42,7 @@ const createOrder = async (req, res) => {
             data: order
         });
     } catch (error) {
-        console.error("Order Creation Error:", error); // Log full error object
+        console.error("Order Creation Error:", error);
         res.status(500).json({
             success: false,
             message: 'Error creating order',
@@ -53,9 +51,7 @@ const createOrder = async (req, res) => {
     }
 };
 
-// @desc    Get all orders (Admin only)
-// @route   GET /api/orders
-// @access  Admin
+
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find({})
@@ -76,9 +72,7 @@ const getAllOrders = async (req, res) => {
     }
 };
 
-// @desc    Get order by ID
-// @route   GET /api/orders/:id
-// @access  User/Admin
+
 const getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
@@ -105,14 +99,12 @@ const getOrderById = async (req, res) => {
     }
 };
 
-// @desc    Update order status (Admin only)
-// @route   PUT /api/orders/:id/status
-// @access  Admin
+
 const updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
 
-        // Validate status
+
         const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
         if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({
@@ -147,9 +139,7 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-// @desc    Get logged in user orders
-// @route   GET /api/orders/myorders
-// @access  User
+
 const getMyOrders = async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 });
@@ -167,10 +157,69 @@ const getMyOrders = async (req, res) => {
     }
 };
 
+
+const cancelOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+
+        if (order.user.toString() !== req.user.id) {
+            return res.status(401).json({
+                success: false,
+                message: 'Not authorized to cancel this order'
+            });
+        }
+
+
+        if (order.status === 'Cancelled' || order.status === 'Delivered') {
+            return res.status(400).json({
+                success: false,
+                message: `Order is already ${order.status}`
+            });
+        }
+
+
+        const orderTime = new Date(order.createdAt).getTime();
+        const currentTime = Date.now();
+        const timeDiff = (currentTime - orderTime) / 1000; // in seconds
+
+        if (timeDiff > 60) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cancellation time exceeded (1 minute limit)'
+            });
+        }
+
+        order.status = 'Cancelled';
+        const updatedOrder = await order.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Order cancelled successfully',
+            data: updatedOrder
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error cancelling order',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
     updateOrderStatus,
-    getMyOrders
+    updateOrderStatus,
+    getMyOrders,
+    cancelOrder,
 };

@@ -1,10 +1,10 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
+
 
 const About = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Navbar />
+
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center">

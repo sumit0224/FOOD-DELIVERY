@@ -108,7 +108,7 @@ const seedDB = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB Connected...');
 
-        // Optional: Clear existing products
+
         const count = await Product.countDocuments();
         if (count > 0) {
             console.log(`Found ${count} existing products. Clearing them...`);

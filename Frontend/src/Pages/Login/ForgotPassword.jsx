@@ -18,7 +18,7 @@ export default function ForgotPassword() {
         try {
             const res = await api.post("users/forgot-password", { email });
             setMessage(res.data.message);
-            // Navigate to Reset Password page, passing email as state
+
             setTimeout(() => {
                 navigate("/reset-password", { state: { email } });
             }, 1500);
@@ -73,8 +73,8 @@ export default function ForgotPassword() {
                 </form>
 
                 <div className="mt-4 text-center">
-                    <Link to="/login" className="text-sm text-gray-600 hover:text-[#FF5200]">
-                        Back to Login
+                    <Link to="/" className="text-sm text-gray-600 hover:text-[#FF5200]">
+                        Back to Home
                     </Link>
                 </div>
             </div>

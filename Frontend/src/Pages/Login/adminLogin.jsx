@@ -32,6 +32,9 @@ export default function Login() {
         formData
       );
 
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", "admin");
       setMessage("✅ Login successful");
@@ -49,7 +52,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#FF5200] px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 relative">
 
-        {/* Back Button */}
+
         <button
           onClick={() => navigate(-1)}
           className="absolute top-5 left-5 flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-black"
@@ -62,7 +65,7 @@ export default function Login() {
           Login to Swiggy
         </h2>
 
-        {/* Message */}
+
         {message && (
           <p className="text-center text-sm mb-4 text-gray-700">
             {message}
@@ -70,7 +73,7 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
+
           <input
             type="email"
             name="email"
@@ -81,7 +84,7 @@ export default function Login() {
             className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
-          {/* Password */}
+
           <input
             type="password"
             name="password"
@@ -92,7 +95,7 @@ export default function Login() {
             className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#FF5200]"
           />
 
-          {/* Button */}
+
           <button
             type="submit"
             disabled={loading}
@@ -107,7 +110,7 @@ export default function Login() {
             Forgot password?
           </span>
 
-          <Link to="/signup">
+          <Link to="/admin-signup">
             <span className="text-[#FF5200] font-semibold cursor-pointer hover:underline">
               Create account
             </span>

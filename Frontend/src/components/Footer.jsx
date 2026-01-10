@@ -7,7 +7,7 @@ const Footer = () => {
         <footer className="bg-[#1a1a1a] text-white pt-20 pb-10 font-sans">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                    {/* Brand Section */}
+
                     <div className="space-y-6">
                         <Link to="/" className="text-3xl font-bold bg-gradient-to-r from-[#FF5200] to-[#ff8c42] bg-clip-text text-transparent inline-block hover:opacity-90 transition-opacity">
                             Swiggy
@@ -28,7 +28,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Company Links */}
+
                     <div>
                         <h3 className="text-lg font-bold text-white mb-6">Company</h3>
                         <ul className="space-y-4 text-sm text-gray-400">
@@ -42,7 +42,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Contact & Legal */}
+
                     <div>
                         <h3 className="text-lg font-bold text-white mb-6">Contact</h3>
                         <ul className="space-y-4 text-sm text-gray-400">
@@ -75,7 +75,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Deliver to */}
+
                     <div>
                         <h3 className="text-lg font-bold text-white mb-6">We deliver to</h3>
                         <ul className="space-y-3 text-sm text-gray-400">
@@ -96,7 +96,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
+
                 <div className="pt-8 mt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-gray-500 text-sm text-center md:text-left">
                         © 2024 Bundl Technologies Pvt. Ltd. All rights reserved.

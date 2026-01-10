@@ -27,7 +27,7 @@ export default function ResetPassword() {
             });
             setMessage(res.data.message);
             setTimeout(() => {
-                navigate("/login");
+                navigate("/");
             }, 2000);
         } catch (err) {
             setError(err.response?.data?.message || "Invalid OTP or error resetting password.");

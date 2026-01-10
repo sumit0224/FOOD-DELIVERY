@@ -1,11 +1,10 @@
 import React from 'react'
 import ProtectedRoute from './components/ProtectedRoute'
+import Layout from './components/Layout/Layout'
 import Home from './Pages/Home'
 import Menu from './Pages/Menu'
 import About from './Pages/About'
 import Contact from './Pages/Contact'
-import SignUp from './Pages/signup/SignUp'
-import Loging from './Pages/Login/Loging'
 import Dashboard from './Pages/dashboard/Dashboard'
 import AdminLogin from "./Pages/Login/AdminLogin"
 import AdminSignup from "./Pages/signup/adminSignup"
@@ -18,6 +17,7 @@ import Checkout from "./Pages/Checkout"
 import ForgotPassword from "./Pages/Login/ForgotPassword"
 import ResetPassword from "./Pages/Login/ResetPassword"
 import AdminUsers from "./Pages/dashboard/AdminUsers"
+import AdminOrders from "./Pages/dashboard/AdminOrders"
 import Footer from "./components/Footer"
 
 import { CartProvider } from "./context/CartContext"
@@ -28,29 +28,29 @@ const App = () => {
     <CartProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Loging />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          } />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            } />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+          </Route>
 
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin-signup" element={<AdminSignup />} />
+
 
           <Route path="/admin-dashboard" element={
             <ProtectedRoute adminOnly={true}>
@@ -77,8 +77,13 @@ const App = () => {
               <EditProduct />
             </ProtectedRoute>
           } />
+          <Route path="/admin/orders" element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminOrders />
+            </ProtectedRoute>
+          } />
         </Routes>
-        <Footer />
+
       </Router>
     </CartProvider>
   )

@@ -8,6 +8,7 @@ export default function UserDashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentTime, setCurrentTime] = useState(Date.now());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,14 +16,14 @@ export default function UserDashboard() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate("/login");
+        navigate("/", { state: { openLogin: true } });
         return;
       }
 
       try {
         const headers = { Authorization: `Bearer ${token}` };
 
-        // Fetch User Profile
+
         const userRes = await api.get("/users/profile", { headers });
         if (userRes.data && userRes.data.user) {
           setUser(userRes.data.user);
@@ -30,7 +31,7 @@ export default function UserDashboard() {
           throw new Error("User data not found");
         }
 
-        // Fetch User Orders
+
         const orderRes = await api.get("/orders/myorders", { headers });
         if (orderRes.data && orderRes.data.data) {
           setOrders(orderRes.data.data);
@@ -41,7 +42,7 @@ export default function UserDashboard() {
         setError(err.response?.data?.message || "Failed to load dashboard data");
         if (err.response?.status === 401) {
           localStorage.removeItem("token");
-          navigate("/login");
+          navigate("/", { state: { openLogin: true } });
         }
       } finally {
         setLoading(false);
@@ -49,7 +50,29 @@ export default function UserDashboard() {
     };
 
     fetchData();
+
+
+    const timer = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, [navigate]);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+
+    try {
+      await api.put(`/orders/${orderId}/cancel`);
+
+      setOrders(orders.map(order =>
+        order._id === orderId ? { ...order, status: 'Cancelled' } : order
+      ));
+      alert("Order cancelled successfully");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to cancel order");
+    }
+  };
 
   if (loading) {
     return (
@@ -79,7 +102,7 @@ export default function UserDashboard() {
     <div className="min-h-screen bg-gray-100 px-4 py-8">
       <div className="max-w-5xl mx-auto">
 
-        {/* Header */}
+
         <div className="bg-[#FF5200] text-white rounded-2xl p-6 mb-6">
           <h1 className="text-2xl font-bold">
             Welcome, {user.name} 👋
@@ -89,10 +112,10 @@ export default function UserDashboard() {
           </p>
         </div>
 
-        {/* Dashboard Cards */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* Profile Card */}
+
           <div className="bg-white rounded-xl shadow p-6 h-fit">
             <h2 className="text-lg font-bold mb-4">
               Profile Information
@@ -109,7 +132,7 @@ export default function UserDashboard() {
             </div>
           </div>
 
-          {/* Orders Card */}
+
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-bold mb-4">
               Your Orders
@@ -128,27 +151,53 @@ export default function UserDashboard() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {orders.map((order) => (
-                  <div key={order._id} className="border border-gray-100 rounded-lg p-4 hover:bg-gray-50 transition">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <span className="text-xs text-gray-400 block mb-1">ID: {order._id.slice(-6).toUpperCase()}</span>
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${order.status === 'Delivered' ? 'bg-green-100 text-green-600' :
+              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                {orders.map((order) => {
+                  const orderTime = new Date(order.createdAt).getTime();
+                  const timeDiff = (currentTime - orderTime) / 1000;
+                  const canCancel = timeDiff < 60 && order.status !== 'Cancelled' && order.status !== 'Delivered';
+                  const remainingTime = Math.max(0, 60 - timeDiff).toFixed(0);
+
+                  return (
+                    <div key={order._id} className="border border-gray-100 rounded-lg p-4 hover:bg-gray-50 transition">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <span className="text-xs text-gray-400 block mb-1">ID: {order._id.slice(-6).toUpperCase()}</span>
+                          <span className={`text-xs font-bold px-2 py-1 rounded-full ${order.status === 'Delivered' ? 'bg-green-100 text-green-600' :
                             order.status === 'Cancelled' ? 'bg-red-100 text-red-600' :
                               'bg-yellow-100 text-yellow-600'
-                          }`}>
-                          {order.status}
-                        </span>
+                            }`}>
+                            {order.status}
+                          </span>
+                        </div>
+                        <span className="text-[#FF5200] font-bold">₹{order.itemsPrice}</span>
                       </div>
-                      <span className="text-[#FF5200] font-bold">₹{order.itemsPrice}</span>
+                      <div className="text-sm text-gray-600 mb-2">
+                        <p>{order.orderItems.length} items</p>
+                        <p className="text-xs text-gray-400 mt-1">{new Date(order.createdAt).toLocaleDateString()}</p>
+                      </div>
+
+
+                      {canCancel && (
+                        <div className="flex items-center justify-between mt-3 bg-red-50 p-2 rounded">
+                          <span className="text-xs text-red-600 font-semibold">Cancel in {remainingTime}s</span>
+                          <button
+                            onClick={() => handleCancelOrder(order._id)}
+                            className="text-white bg-red-500 hover:bg-red-600 text-xs px-3 py-1 rounded font-bold transition"
+                          >
+                            Cancel Order
+                          </button>
+                        </div>
+                      )}
+
+                      {timeDiff > 60 && order.status !== 'Cancelled' && order.status !== 'Delivered' && (
+                        <div className="mt-2 text-xs text-gray-400 italic">
+                          Cancellation period expired
+                        </div>
+                      )}
                     </div>
-                    <div className="text-sm text-gray-600">
-                      <p>{order.orderItems.length} items</p>
-                      <p className="text-xs text-gray-400 mt-1">{new Date(order.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
