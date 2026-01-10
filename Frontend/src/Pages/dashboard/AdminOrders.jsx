@@ -79,7 +79,7 @@ export default function AdminOrders() {
                     <h2 className="text-2xl font-extrabold tracking-wide text-[#FF5200]">Swiggy Admin</h2>
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
-                    <Link to="/admin-dashboard" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-lg transition-colors text-gray-300 hover:text-white">
+                    <Link to="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-lg transition-colors text-gray-300 hover:text-white">
                         <FaChartLine /> Dashboard
                     </Link>
                     <Link to="/admin/orders" className="flex items-center gap-3 px-4 py-3 bg-gray-800 rounded-lg text-[#FF5200]">

@@ -55,7 +55,7 @@ export default function AdminUsers() {
 
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div className="flex items-center gap-4">
-                        <Link to="/admin-dashboard" className="text-gray-500 hover:text-[#FF5200] transition-colors">
+                        <Link to="/admin/dashboard" className="text-gray-500 hover:text-[#FF5200] transition-colors">
                             <FaArrowLeft size={20} />
                         </Link>
                         <h1 className="text-3xl font-bold text-gray-800">User Management</h1>

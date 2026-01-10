@@ -47,7 +47,7 @@ export default function Login() {
       // Use replace logic or just navigate? The login function updates context.
       // Context protection might not update instantly? 
       // navigate should work fine as state updates.
-      navigate("/admin-dashboard");
+      navigate("/admin/dashboard");
     } catch (error) {
       setMessage(
         error.response?.data?.message || "❌ Invalid email or password"

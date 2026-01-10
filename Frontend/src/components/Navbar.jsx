@@ -19,11 +19,9 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
-  const [location, setLocation] = useState("Set Location");
 
   useEffect(() => {
-    const savedLocation = localStorage.getItem("userLocation");
-    if (savedLocation) setLocation(savedLocation);
+
 
     if (locationHook.state?.openLogin) {
       setShowAuthModal(true);

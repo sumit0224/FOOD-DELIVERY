@@ -3,6 +3,7 @@ import api from "../api/api";
 
 const AuthContext = createContext(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -26,8 +27,16 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        // 🔹 Single source of truth → backend decides role
-        const res = await api.get("users/profile");
+        // 🔹 Determine endpoint based on stored role
+        let endpoint = "users/profile";
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser.role === 'admin') {
+            endpoint = "admin/profile";
+          }
+        }
+
+        const res = await api.get(endpoint);
 
         const userData = res.data?.user || res.data?.data;
 

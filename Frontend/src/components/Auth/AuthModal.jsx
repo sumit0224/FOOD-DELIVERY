@@ -75,8 +75,8 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          err.message ||
-          "Authentication failed"
+        err.message ||
+        "Authentication failed"
       );
     } finally {
       setLoading(false);
@@ -202,4 +202,4 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   );
 };
 
-expo
+export default AuthModal;

@@ -50,7 +50,7 @@ export default function AdminProducts() {
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => navigate("/admin-dashboard")}
+                            onClick={() => navigate("/admin/dashboard")}
                             className="p-2 bg-white rounded-full shadow hover:bg-gray-100 transition"
                         >
                             <FaArrowLeft className="text-gray-600" />
