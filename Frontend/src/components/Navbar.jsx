@@ -103,8 +103,18 @@ const Navbar = () => {
         {/* Desktop Links */}
         <ul className="hidden md:flex items-center gap-8 text-[16px] font-semibold">
 
-          <li className="cursor-pointer hover:text-gray-100 transition">Offers</li>
-          <li className="cursor-pointer hover:text-gray-100 transition">Help</li>
+          <li className="cursor-pointer hover:text-gray-100 transition">
+            <Link to="/">Home</Link>
+          </li>
+          <li className="cursor-pointer hover:text-gray-100 transition">
+            <Link to="/menu">Menu</Link>
+          </li>
+          <li className="cursor-pointer hover:text-gray-100 transition">
+            <Link to="/about">About</Link>
+          </li>
+          <li className="cursor-pointer hover:text-gray-100 transition">
+            <Link to="/contact">Contact</Link>
+          </li>
 
           <Link to="/cart">
             <li className="flex items-center gap-2 cursor-pointer hover:text-gray-100 relative">
@@ -130,6 +140,7 @@ const Navbar = () => {
                 className="cursor-pointer hover:text-red-100 text-sm font-normal bg-white/20 px-3 py-1 rounded-md transition"
                 onClick={() => {
                   localStorage.removeItem("token");
+                  localStorage.removeItem("role");
                   localStorage.removeItem("userLocation"); // Optional: clear location on logout
                   setIsLoggedIn(false);
                   window.location.href = "/login";
@@ -168,8 +179,10 @@ const Navbar = () => {
                 </div>
               </li>
 
-              <li>Offers</li>
-              <li>Help</li>
+              <li><Link to="/" onClick={() => setOpen(false)}>Home</Link></li>
+              <li><Link to="/menu" onClick={() => setOpen(false)}>Menu</Link></li>
+              <li><Link to="/about" onClick={() => setOpen(false)}>About Us</Link></li>
+              <li><Link to="/contact" onClick={() => setOpen(false)}>Contact</Link></li>
 
               <Link to="/cart" onClick={() => setOpen(false)}>
                 <li className="flex items-center gap-2 w-fit">
@@ -195,6 +208,7 @@ const Navbar = () => {
                     className="flex items-center gap-2 w-fit cursor-pointer text-red-100 hover:text-white"
                     onClick={() => {
                       localStorage.removeItem("token");
+                      localStorage.removeItem("role");
                       setOpen(false);
                       setIsLoggedIn(false);
                       window.location.href = "/login";

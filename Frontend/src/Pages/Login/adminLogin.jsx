@@ -33,6 +33,7 @@ export default function Login() {
       );
 
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", "admin");
       setMessage("✅ Login successful");
       navigate("/admin-dashboard");
     } catch (error) {

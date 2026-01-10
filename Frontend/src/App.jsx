@@ -1,5 +1,9 @@
 import React from 'react'
+import ProtectedRoute from './components/ProtectedRoute'
 import Home from './Pages/Home'
+import Menu from './Pages/Menu'
+import About from './Pages/About'
+import Contact from './Pages/Contact'
 import SignUp from './Pages/signup/SignUp'
 import Loging from './Pages/Login/Loging'
 import Dashboard from './Pages/dashboard/Dashboard'
@@ -25,22 +29,54 @@ const App = () => {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Loging />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout" element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          } />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin-signup" element={<AdminSignup />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/create-product" element={<CreateProduct />} />
-          <Route path="/admin/edit-product/:id" element={<EditProduct />} />
+
+          <Route path="/admin-dashboard" element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/products" element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminProducts />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/users" element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminUsers />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/create-product" element={
+            <ProtectedRoute adminOnly={true}>
+              <CreateProduct />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/edit-product/:id" element={
+            <ProtectedRoute adminOnly={true}>
+              <EditProduct />
+            </ProtectedRoute>
+          } />
         </Routes>
         <Footer />
       </Router>

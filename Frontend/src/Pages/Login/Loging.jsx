@@ -40,6 +40,7 @@ export default function Login() {
       );
 
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", "user");
       setMessage(`login successful`);
       navigate("/");
     } catch (error) {
