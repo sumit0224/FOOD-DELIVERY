@@ -1,92 +1,84 @@
-import React from 'react'
-import ProtectedRoute from './components/ProtectedRoute'
-import Layout from './components/Layout/Layout'
-import Home from './Pages/Home'
-import Menu from './Pages/Menu'
-import About from './Pages/About'
-import Contact from './Pages/Contact'
-import Dashboard from './Pages/dashboard/Dashboard'
-import AdminLogin from "./Pages/Login/AdminLogin"
-import AdminSignup from "./Pages/signup/adminSignup"
-import AdminDashboard from "./Pages/dashboard/AdminDash"
-import CreateProduct from "./Pages/dashboard/CreateProduct"
-import AdminProducts from "./Pages/dashboard/AdminProducts"
-import EditProduct from "./Pages/dashboard/EditProduct"
-import Cart from "./Pages/Cart"
-import Checkout from "./Pages/Checkout"
-import ForgotPassword from "./Pages/Login/ForgotPassword"
-import ResetPassword from "./Pages/Login/ResetPassword"
-import AdminUsers from "./Pages/dashboard/AdminUsers"
-import AdminOrders from "./Pages/dashboard/AdminOrders"
-import Footer from "./components/Footer"
 
-import { CartProvider } from "./context/CartContext"
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+/* Layout */
+import Layout from "./components/Layout/Layout";
+
+/* Public Pages */
+import Home from "./Pages/Home";
+import Menu from "./Pages/Menu";
+import About from "./Pages/About";
+import Contact from "./Pages/Contact";
+import Cart from "./Pages/Cart";
+
+/* Auth Pages */
+import ForgotPassword from "./Pages/Login/ForgotPassword";
+import ResetPassword from "./Pages/Login/ResetPassword";
+import AdminLogin from "./Pages/Login/AdminLogin";
+import AdminSignup from "./Pages/signup/adminSignup";
+
+/* User Pages */
+import Dashboard from "./Pages/dashboard/Dashboard";
+import Checkout from "./Pages/Checkout";
+
+/* Admin Pages */
+import AdminDashboard from "./Pages/dashboard/AdminDash";
+import AdminProducts from "./Pages/dashboard/AdminProducts";
+import CreateProduct from "./Pages/dashboard/CreateProduct";
+import EditProduct from "./Pages/dashboard/EditProduct";
+import AdminUsers from "./Pages/dashboard/AdminUsers";
+import AdminOrders from "./Pages/dashboard/AdminOrders";
+
+/* Protection */
+import ProtectedRoute from "./components/ProtectedRoute";
+
+/* Context */
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 
 const App = () => {
   return (
-    <CartProvider>
-      <Router>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={
-              <ProtectedRoute>
-                <Checkout />
-              </ProtectedRoute>
-            } />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-          </Route>
+    <AuthProvider>
+      <CartProvider>
+        <Router>
+          <Routes>
 
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin-signup" element={<AdminSignup />} />
+            {/* ================= PUBLIC ROUTES ================= */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+            </Route>
 
+            {/* ================= USER PROTECTED ROUTES ================= */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/checkout" element={<Checkout />} />
+            </Route>
 
-          <Route path="/admin-dashboard" element={
-            <ProtectedRoute adminOnly={true}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/products" element={
-            <ProtectedRoute adminOnly={true}>
-              <AdminProducts />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/users" element={
-            <ProtectedRoute adminOnly={true}>
-              <AdminUsers />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/create-product" element={
-            <ProtectedRoute adminOnly={true}>
-              <CreateProduct />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/edit-product/:id" element={
-            <ProtectedRoute adminOnly={true}>
-              <EditProduct />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/orders" element={
-            <ProtectedRoute adminOnly={true}>
-              <AdminOrders />
-            </ProtectedRoute>
-          } />
-        </Routes>
+            {/* ================= ADMIN AUTH ================= */}
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin-signup" element={<AdminSignup />} />
 
-      </Router>
-    </CartProvider>
-  )
-}
+            {/* ================= ADMIN PROTECTED ROUTES ================= */}
+            <Route element={<ProtectedRoute adminOnly />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/products" element={<AdminProducts />} />
+              <Route path="/admin/create-product" element={<CreateProduct />} />
+              <Route path="/admin/edit-product/:id" element={<EditProduct />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+            </Route>
 
-export default App
+          </Routes>
+        </Router>
+      </CartProvider>
+    </AuthProvider>
+  );
+};
+
+export default App;

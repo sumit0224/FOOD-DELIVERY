@@ -3,8 +3,11 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
+import { useAuth } from "../../context/AuthContext";
+
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,12 +35,18 @@ export default function Login() {
         formData
       );
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+      if (res.data.data.role !== 'admin') {
+        setMessage("❌ Access denied. Admins only.");
+        setLoading(false);
+        return;
+      }
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", "admin");
+      login(res.data.data, res.data.token);
+
       setMessage("✅ Login successful");
+      // Use replace logic or just navigate? The login function updates context.
+      // Context protection might not update instantly? 
+      // navigate should work fine as state updates.
       navigate("/admin-dashboard");
     } catch (error) {
       setMessage(

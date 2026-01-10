@@ -36,7 +36,7 @@ export default function CreateProduct() {
             // Assuming the endpoint is "products" based on standard REST conventions and existing structure references
             // The implementation plan research showed existing routes at /api/products
             // The api instance likely has the base url set, so we just need "products"
-            const res = await api.post("products", formData, {
+            await api.post("products", formData, {
                 headers: {
                     "Content-Type": "application/json",
                     // Auth token handles by interceptor or we might need it if not automatic

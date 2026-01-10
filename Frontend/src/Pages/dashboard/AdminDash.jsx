@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/api";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { FaBox, FaUsers, FaChartLine, FaSignOutAlt, FaClipboardList } from "react-icons/fa";
 
 export default function AdminDashboard() {
@@ -11,30 +12,22 @@ export default function AdminDashboard() {
     });
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { logout } = useAuth(); // Use logout from context
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    navigate("/admin");
-                    return;
-                }
+                // Token handled by interceptor
+                // No need to check token manually as ProtectedRoute covers it
 
-                const headers = { Authorization: `Bearer ${token}` };
-
-
-                const usersRes = await api.get("/users", { headers });
+                const usersRes = await api.get("/users");
                 const usersCount = usersRes.data.count || 0;
 
-
-                const ordersRes = await api.get("/orders", { headers });
+                const ordersRes = await api.get("/orders");
                 const orders = ordersRes.data.data || [];
 
-
                 const revenue = orders.reduce((acc, order) => acc + (order.itemsPrice || 0), 0);
-
 
                 const pendingCount = orders.filter(o => o.status === 'Pending').length;
 
@@ -44,12 +37,12 @@ export default function AdminDashboard() {
                     pendingOrders: pendingCount
                 });
 
-
                 setRecentOrders(orders.slice(0, 5));
 
             } catch (error) {
                 console.error("Dashboard Fetch Error", error);
                 if (error.response?.status === 401 || error.response?.status === 403) {
+                    // Let auth context or interceptor handle it, or just navigate
                     navigate("/admin");
                 }
             } finally {
@@ -61,8 +54,7 @@ export default function AdminDashboard() {
     }, [navigate]);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
+        logout();
         navigate("/admin");
     };
 

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
 import { FaUser, FaEnvelope } from "react-icons/fa";
 
 export default function UserDashboard() {
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, loading: authLoading } = useAuth(); // usage of context
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -13,26 +14,12 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        navigate("/", { state: { openLogin: true } });
-        return;
-      }
-
       try {
-        const headers = { Authorization: `Bearer ${token}` };
+        // No need to fetch user, context has it.
+        // Also headers are handled by api interceptor.
 
-
-        const userRes = await api.get("/users/profile", { headers });
-        if (userRes.data && userRes.data.user) {
-          setUser(userRes.data.user);
-        } else {
-          throw new Error("User data not found");
-        }
-
-
-        const orderRes = await api.get("/orders/myorders", { headers });
+        // Only fetch orders
+        const orderRes = await api.get("/orders/myorders");
         if (orderRes.data && orderRes.data.data) {
           setOrders(orderRes.data.data);
         }
@@ -40,24 +27,26 @@ export default function UserDashboard() {
       } catch (err) {
         console.error("Dashboard Error:", err);
         setError(err.response?.data?.message || "Failed to load dashboard data");
-        if (err.response?.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/", { state: { openLogin: true } });
-        }
+        // Don't auto-logout here, let simple error show
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    // If auth is still loading, wait.
+    if (!authLoading && isAuthenticated) {
+      fetchData();
+    }
+  }, [authLoading, isAuthenticated, navigate]); // Dependencies updated
 
 
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(Date.now());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, []);
 
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm("Are you sure you want to cancel this order?")) return;
@@ -74,7 +63,7 @@ export default function UserDashboard() {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-xl">
         Loading dashboard...
