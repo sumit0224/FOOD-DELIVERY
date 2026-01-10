@@ -44,6 +44,7 @@ const createOrder = async (req, res) => {
             data: order
         });
     } catch (error) {
+        console.error("Order Creation Error:", error); // Log full error object
         res.status(500).json({
             success: false,
             message: 'Error creating order',

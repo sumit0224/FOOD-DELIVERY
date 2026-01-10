@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaCreditCard, FaArrowLeft } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
@@ -16,6 +16,15 @@ export default function Checkout() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    // Check for authentication
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("You must be logged in to place an order.");
+            navigate("/login");
+        }
+    }, [navigate]);
+
     if (cartItems.length === 0) {
         navigate("/"); // Redirect if cart is empty
         return null;
@@ -30,42 +39,42 @@ export default function Checkout() {
         setLoading(true);
         setError("");
 
-        // Construct payload strictly matching the backend model if needed.
-        // Order Model expects:
-        // orderItems: [{ name, quantity, price, product }]
-        // shippingAddress: { address, city, postalCode }
-        // paymentMethod: string
-        // itemsPrice: number
-
-        // We need to map cartItems to orderItems.
-        // product field in orderItem is the ID.
-
-        const orderItems = cartItems.map(item => ({
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            product: item._id
-        }));
-
-        const shippingAddress = {
-            address: address.street, // Mapping 'street' to 'address' as per model common convention or verifying usage
-            city: address.city,
-            postalCode: address.postalCode
-        };
-
         try {
-            await api.post("orders", {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                throw new Error("Authentication token not found. Please login again.");
+            }
+
+            const orderItems = cartItems.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                product: item._id
+            }));
+
+            // Validate orderItems
+            if (orderItems.some(item => !item.product)) {
+                throw new Error("Invalid cart items: Missing product ID.");
+            }
+
+            const shippingAddress = {
+                address: address.street,
+                city: address.city,
+                postalCode: address.postalCode
+            };
+
+            const payload = {
                 orderItems,
                 shippingAddress,
-                paymentMethod: "COD", // Hardcoded for simplified flow or add radio buttons
+                paymentMethod: "COD",
                 itemsPrice: cartTotal,
-                // taxPrice, shippingPrice, totalPrice might be calculated by backend or defaults? 
-                // Backend default is 0.0 for itemsPrice, checking model... 
-                // Model only requires: user, orderItems, shippingAddress, paymentMethod, itemsPrice. 
-                // User is likely from token in backend middleware.
-            }, {
+            };
+
+            console.log("Sending Order Payload:", payload);
+
+            await api.post("orders", payload, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                    Authorization: `Bearer ${token}`
                 }
             });
 
@@ -73,8 +82,11 @@ export default function Checkout() {
             alert("Order placed successfully!");
             navigate("/"); // Or to an /orders page if it existed
         } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.message || "Failed to place order.");
+            console.error("Order Creation Error:", err);
+            const responseData = err.response?.data;
+            const errorMessage = responseData?.message || err.message || "Failed to place order.";
+            const errorDetails = responseData?.error ? ` (${JSON.stringify(responseData.error)})` : "";
+            setError(errorMessage + errorDetails);
         } finally {
             setLoading(false);
         }

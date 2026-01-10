@@ -11,7 +11,7 @@ const Contact = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Placeholder for form submission submission logic
+
         alert("Thank you for your message! We'll get back to you soon.");
         setFormData({ name: '', email: '', message: '' });
     };
@@ -29,7 +29,6 @@ const Contact = () => {
                     </div>
 
                     <div className="grid lg:grid-cols-2 gap-12">
-                        {/* Contact Info */}
                         <div className="bg-white rounded-2xl shadow-lg p-8 space-y-8">
                             <div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
@@ -69,7 +68,7 @@ const Contact = () => {
                                 </div>
                             </div>
 
-                            {/* Map Placeholder */}
+
                             <div className="h-64 bg-gray-200 rounded-xl overflow-hidden relative">
                                 <iframe
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3782.2613173278896!2d73.91411937501422!3d18.562253982539413!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2c147b8b3a3bf%3A0x6f7fdcc8e4d6c77e!2sPhoenix%20Marketcity%20Pune!5e0!3m2!1sen!2sin!4v1716383424107!5m2!1sen!2sin"
@@ -84,7 +83,7 @@ const Contact = () => {
                             </div>
                         </div>
 
-                        {/* Form */}
+
                         <div className="bg-white rounded-2xl shadow-lg p-8">
                             <h3 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h3>
                             <form onSubmit={handleSubmit} className="space-y-6">

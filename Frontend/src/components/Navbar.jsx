@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { cartCount } = useCart();
 
-  // Location States
+
   const [location, setLocation] = useState("Detecting...");
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [manualLocation, setManualLocation] = useState("");
@@ -24,7 +24,7 @@ const Navbar = () => {
     checkAuth();
     window.addEventListener("storage", checkAuth);
 
-    // Initial Location Check
+
     const savedLocation = localStorage.getItem("userLocation");
     if (savedLocation) {
       setLocation(savedLocation);
@@ -41,7 +41,7 @@ const Navbar = () => {
         async (position) => {
           const { latitude, longitude } = position.coords;
           try {
-            // Reverse Geocoding using OpenStreetMap (Free, requires User-Agent)
+
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
             );
@@ -78,7 +78,7 @@ const Navbar = () => {
     <>
       <nav className="w-full h-[80px] text-white flex items-center justify-between px-4 sm:px-8 lg:px-20 sticky top-0 z-50 bg-[#FF5200] shadow-md">
         <div className="flex items-center gap-8">
-          {/* Logo */}
+
           <div className="logo cursor-pointer">
             <Link to="/">
               <img
@@ -89,7 +89,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Location Display (Desktop) */}
+
           <div className="hidden md:flex items-center gap-2 text-white cursor-pointer hover:bg-white/10 p-2 rounded-lg transition" onClick={() => setShowLocationModal(true)}>
             <span className="font-bold border-b-2 border-white pb-0.5" title="Change Location">
               {location}
@@ -100,7 +100,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Desktop Links */}
+
         <ul className="hidden md:flex items-center gap-8 text-[16px] font-semibold">
 
           <li className="cursor-pointer hover:text-gray-100 transition">
@@ -141,7 +141,7 @@ const Navbar = () => {
                 onClick={() => {
                   localStorage.removeItem("token");
                   localStorage.removeItem("role");
-                  localStorage.removeItem("userLocation"); // Optional: clear location on logout
+                  localStorage.removeItem("userLocation");
                   setIsLoggedIn(false);
                   window.location.href = "/login";
                 }}
@@ -158,7 +158,7 @@ const Navbar = () => {
           )}
         </ul>
 
-        {/* Mobile Menu Button */}
+
         <button
           className="md:hidden text-3xl text-white"
           onClick={() => setOpen(!open)}
@@ -166,11 +166,11 @@ const Navbar = () => {
           {open ? <HiX /> : <HiMenu />}
         </button>
 
-        {/* Mobile Menu */}
+
         {open && (
           <div className="absolute top-[80px] left-0 w-full bg-[#FF5200] z-50 md:hidden shadow-xl border-t border-white/20">
             <ul className="flex flex-col gap-6 px-6 py-8 text-[16px] font-bold text-white">
-              {/* Mobile Location */}
+
               <li className="flex flex-col gap-1 border-b border-white/20 pb-4" onClick={() => { setShowLocationModal(true); setOpen(false); }}>
                 <span className="text-sm opacity-80 uppercase tracking-wider">Delivering to</span>
                 <div className="flex items-center gap-2">
@@ -229,7 +229,7 @@ const Navbar = () => {
         )}
       </nav>
 
-      {/* Location Modal */}
+
       {showLocationModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl transform transition-all scale-100">

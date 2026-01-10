@@ -9,11 +9,11 @@ const Menu = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Filters & Sorting States
+
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [priceRange, setPriceRange] = useState([0, 1000]); // Max price assumed
-    const [sortOrder, setSortOrder] = useState("default"); // default, price-low-high, price-high-low, a-z
+    const [priceRange, setPriceRange] = useState([0, 1000]);
+    const [sortOrder, setSortOrder] = useState("default");
 
     const { addToCart, cartItems, updateQuantity } = useCart();
 
@@ -39,7 +39,7 @@ const Menu = () => {
     const applyFilters = () => {
         let result = [...products];
 
-        // 1. Search
+
         if (searchTerm) {
             result = result.filter(p =>
                 p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,15 +47,15 @@ const Menu = () => {
             );
         }
 
-        // 2. Category
+
         if (selectedCategory !== "All") {
             result = result.filter(p => p.category === selectedCategory);
         }
 
-        // 3. Price Range
+
         result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
 
-        // 4. Sorting
+
         if (sortOrder === "price-low-high") {
             result.sort((a, b) => a.price - b.price);
         } else if (sortOrder === "price-high-low") {
@@ -77,7 +77,7 @@ const Menu = () => {
     return (
         <div className="bg-gray-50 min-h-screen">
             <Navbar />
-            {/* Header / Search Bar */}
+
             <div className="bg-white shadow-sm sticky top-[80px] z-40">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
                     <div className="relative w-full md:w-96">
@@ -107,14 +107,14 @@ const Menu = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
-                {/* Sidebar Filters */}
+
                 <div className="w-full lg:w-64 flex-shrink-0 space-y-8">
                     <div className="bg-white p-6 rounded-xl shadow-sm">
                         <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                             <FaFilter className="text-[#FF5200]" /> Filters
                         </h3>
 
-                        {/* Categories */}
+
                         <div className="mb-6">
                             <h4 className="font-semibold mb-3 text-gray-700">Categories</h4>
                             <div className="space-y-2">
@@ -135,7 +135,7 @@ const Menu = () => {
                             </div>
                         </div>
 
-                        {/* Price Range */}
+
                         <div>
                             <h4 className="font-semibold mb-3 text-gray-700">Price Range</h4>
                             <input
@@ -155,7 +155,7 @@ const Menu = () => {
                     </div>
                 </div>
 
-                {/* Product Grid */}
+
                 <div className="flex-1">
                     {loading ? (
                         <div className="flex justify-center items-center h-64">

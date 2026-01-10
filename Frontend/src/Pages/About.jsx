@@ -7,7 +7,6 @@ const About = () => {
       <Navbar />
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-12">
-          {/* Helper Hero Section */}
           <div className="text-center">
             <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
               Our Story
@@ -17,7 +16,6 @@ const About = () => {
             </p>
           </div>
 
-          {/* Content Section */}
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="grid md:grid-cols-2">
               <div className="relative h-64 md:h-auto">
@@ -52,7 +50,6 @@ const About = () => {
             </div>
           </div>
 
-          {/* Stats Section */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center bg-white p-8 rounded-2xl shadow-sm">
             <div>
               <div className="text-3xl font-bold text-[#FF5200] mb-2">500+</div>
