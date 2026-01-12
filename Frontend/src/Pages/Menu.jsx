@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import api from '../api/api';
 
 import { useCart } from '../context/CartContext';
-import { FaPlus, FaMinus, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaSearch, FaFilter, FaTimes } from 'react-icons/fa';
 
 const Menu = () => {
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -106,11 +107,48 @@ const Menu = () => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
+            <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 relative">
 
-                <div className="w-full lg:w-64 flex-shrink-0 space-y-8">
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                {/* Mobile Filter Button - Fixed at bottom right */}
+                <button
+                    onClick={() => setShowMobileFilters(!showMobileFilters)}
+                    className="lg:hidden fixed bottom-6 right-6 z-50 bg-[#FF5200] text-white p-4 rounded-full shadow-2xl hover:bg-[#e64a00] transition-all transform hover:scale-110"
+                >
+                    <FaFilter size={20} />
+                </button>
+
+                {/* Mobile Filter Overlay */}
+                {showMobileFilters && (
+                    <div
+                        className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+                        onClick={() => setShowMobileFilters(false)}
+                    />
+                )}
+
+                {/* Filter Sidebar - Sticky on desktop, Drawer on mobile */}
+                <div className={`
+                    w-full lg:w-64 flex-shrink-0
+                    lg:relative
+                    fixed inset-y-0 left-0 z-50
+                    transform transition-transform duration-300 ease-in-out
+                    ${showMobileFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                `}>
+                    <div className="bg-white p-6 rounded-xl shadow-sm lg:sticky lg:top-40 h-full lg:h-auto lg:max-h-[calc(100vh-120px)] overflow-y-auto">
+                        {/* Mobile Close Button */}
+                        <div className="flex justify-between items-center mb-4 lg:hidden">
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                <FaFilter className="text-[#FF5200]" /> Filters
+                            </h3>
+                            <button
+                                onClick={() => setShowMobileFilters(false)}
+                                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                            >
+                                <FaTimes className="text-gray-600" size={20} />
+                            </button>
+                        </div>
+
+                        {/* Desktop Header */}
+                        <h3 className="hidden lg:flex font-bold text-lg mb-4 items-center gap-2">
                             <FaFilter className="text-[#FF5200]" /> Filters
                         </h3>
 
@@ -124,7 +162,10 @@ const Menu = () => {
                                             type="radio"
                                             name="category"
                                             checked={selectedCategory === cat}
-                                            onChange={() => setSelectedCategory(cat)}
+                                            onChange={() => {
+                                                setSelectedCategory(cat);
+                                                setShowMobileFilters(false);
+                                            }}
                                             className="text-[#FF5200] focus:ring-[#FF5200]"
                                         />
                                         <span className={selectedCategory === cat ? "text-[#FF5200] font-medium" : "text-gray-600"}>
@@ -136,7 +177,7 @@ const Menu = () => {
                         </div>
 
 
-                        <div>
+                        <div className="mb-6">
                             <h4 className="font-semibold mb-3 text-gray-700">Price Range</h4>
                             <input
                                 type="range"
@@ -152,6 +193,14 @@ const Menu = () => {
                                 <span>₹{priceRange[1]}</span>
                             </div>
                         </div>
+
+                        {/* Apply Filters Button (Mobile Only) */}
+                        <button
+                            onClick={() => setShowMobileFilters(false)}
+                            className="lg:hidden w-full bg-[#FF5200] text-white py-3 rounded-lg font-semibold hover:bg-[#e64a00] transition"
+                        >
+                            Apply Filters
+                        </button>
                     </div>
                 </div>
 

@@ -12,6 +12,7 @@ const {
     getAllUsers
 } = require('../controllers/userController');
 const { protect, customerOnly, adminOnly } = require('../middleware/authMiddleware');
+const { otpRateLimit } = require('../middleware/rateLimitMiddleware');
 
 
 router.post('/register', registerUser);
@@ -23,12 +24,13 @@ router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 
 
-router.post('/forgot-password', forgotPassword);
+// Forgot password (rate limited)
+router.post('/forgot-password', otpRateLimit, forgotPassword);
 
+// Verify OTP (rate limited)
+router.post('/verify-otp', otpRateLimit, verifyOtp);
 
-router.post('/verify-otp', verifyOtp);
-
-
+// Reset password
 router.post('/reset-password', resetPassword);
 
 

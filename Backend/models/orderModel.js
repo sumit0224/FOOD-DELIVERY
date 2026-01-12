@@ -44,6 +44,16 @@ const orderSchema = new mongoose.Schema(
       required: true,
       default: 0.0,
     },
+    cancelledBy: {
+      type: String,
+      enum: ['Admin', 'User'],
+    },
+    cancelledAt: {
+      type: Date,
+    },
+    cancelReason: {
+      type: String,
+    },
   },
   {
     timestamps: true,

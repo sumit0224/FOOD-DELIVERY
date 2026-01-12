@@ -1,5 +1,7 @@
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
+const { emitNewOrderToAdmin, emitOrderUpdateToUser, emitOrderCancellation } = require('../socket/socketManager');
+const { sendOrderNotificationToAdmin, sendOrderCancelledEmail } = require('../services/emailService');
 
 
 const createOrder = async (req, res) => {
@@ -35,6 +37,24 @@ const createOrder = async (req, res) => {
             itemsPrice: itemsPrice || 0,
             status: 'Pending'
         });
+
+        // Populate for email
+        await order.populate('user', 'name email phone address');
+
+        // Send email notification to admin
+        try {
+            await sendOrderNotificationToAdmin(order);
+        } catch (emailError) {
+            console.error('Failed to send admin email:', emailError);
+            // Continue even if email fails
+        }
+
+        // Emit socket event to admin
+        try {
+            emitNewOrderToAdmin(order);
+        } catch (socketError) {
+            console.error('Failed to emit socket event:', socketError);
+        }
 
         res.status(201).json({
             success: true,
@@ -125,6 +145,17 @@ const updateOrderStatus = async (req, res) => {
         order.status = status;
         const updatedOrder = await order.save();
 
+        // Emit socket event to user
+        try {
+            emitOrderUpdateToUser(order.user.toString(), {
+                orderId: order._id,
+                status: status,
+                message: `Your order status has been updated to ${status}`
+            });
+        } catch (socketError) {
+            console.error('Failed to emit socket event:', socketError);
+        }
+
         res.status(200).json({
             success: true,
             message: 'Order status updated successfully',
@@ -214,12 +245,91 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+/**
+ * Admin Cancel Order
+ * Allows admin to cancel any order with reason
+ */
+const cancelOrderByAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { cancelReason } = req.body;
+
+        const order = await Order.findById(id).populate('user', 'name email');
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Prevent cancelling already cancelled or delivered orders
+        if (order.status === 'Cancelled') {
+            return res.status(400).json({
+                success: false,
+                message: 'Order is already cancelled'
+            });
+        }
+
+        if (order.status === 'Delivered') {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot cancel delivered orders'
+            });
+        }
+
+        // Update order status
+        order.status = 'Cancelled';
+        order.cancelledBy = 'Admin';
+        order.cancelledAt = new Date();
+        order.cancelReason = cancelReason || 'Cancelled by admin';
+
+        const cancelledOrder = await order.save();
+
+        // Send email to user
+        try {
+            await sendOrderCancelledEmail(order.user.email, {
+                orderId: order._id,
+                cancelledBy: 'Admin',
+                cancelReason: cancelReason,
+                userName: order.user.name
+            });
+        } catch (emailError) {
+            console.error('Failed to send cancellation email:', emailError);
+        }
+
+        // Emit socket event to user
+        try {
+            emitOrderCancellation(order.user._id.toString(), {
+                orderId: order._id,
+                cancelledBy: 'Admin',
+                cancelReason: cancelReason,
+                message: 'Your order has been cancelled by admin'
+            });
+        } catch (socketError) {
+            console.error('Failed to emit socket event:', socketError);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Order cancelled successfully',
+            data: cancelledOrder
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error cancelling order',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
     updateOrderStatus,
-    updateOrderStatus,
     getMyOrders,
     cancelOrder,
+    cancelOrderByAdmin,
 };

@@ -11,6 +11,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 
 
 connectDB();
@@ -36,6 +37,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/cart', cartRoutes);
 
 
 app.use((err, req, res, next) => {
@@ -48,6 +50,16 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`server running on port ${PORT}`);
-})
+
+// Create HTTP server for Socket.IO
+const http = require('http');
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const { initializeSocket } = require('./socket/socketManager');
+initializeSocket(server);
+
+server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📡 Socket.IO initialized`);
+});

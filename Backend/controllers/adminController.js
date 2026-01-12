@@ -36,6 +36,10 @@ const registerAdmin = async (req, res) => {
             role: 'admin'
         });
 
+        // Log audit trail
+        console.log(`✅ New admin created by: ${req.user.email} (ID: ${req.user.id})`);
+        console.log(`   New admin: ${admin.email} (ID: ${admin._id})`);
+
 
         const token = jwt.sign(
             { id: admin._id, role: admin.role },

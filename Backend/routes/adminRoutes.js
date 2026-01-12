@@ -8,8 +8,8 @@ const {
 } = require('../controllers/adminController');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 
-
-router.post('/register', registerAdmin);
+// Admin registration - Protected: Only existing admins can create new admins
+router.post('/register', protect, adminOnly, registerAdmin);
 
 
 router.post('/login', loginAdmin);

@@ -248,31 +248,63 @@ const logoutUser = (req, res) => {
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
+
+        // Validate email input
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required'
+            });
+        }
+
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({
+                success: false,
+                message: 'User not found with this email'
+            });
         }
 
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
+        // Hash OTP before storing (security best practice)
+        const salt = await bcrypt.genSalt(10);
+        const hashedOtp = await bcrypt.hash(otp, salt);
 
-
+        // Set OTP expiry (10 minutes)
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-        user.otp = otp;
+        user.otp = hashedOtp;
         user.otpExpires = otpExpires;
         await user.save();
 
+        // Send OTP via email
+        const emailService = require('../services/emailService');
+        try {
+            await emailService.sendOtpEmail(email, otp);
+        } catch (emailError) {
+            console.error('Email sending failed:', emailError);
+            // OTP is still saved, so user can try again or use console OTP in development
+        }
 
-        console.log(`OTP for ${email}: ${otp}`);
+        // In development, log OTP to console
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`🔐 OTP for ${email}: ${otp}`);
+        }
 
         res.status(200).json({
             success: true,
-            message: 'OTP sent to email',
-
+            message: 'OTP sent to your email address',
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error sending OTP', error: error.message });
+        console.error('Forgot password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error sending OTP',
+            error: error.message
+        });
     }
 };
 
@@ -280,19 +312,48 @@ const forgotPassword = async (req, res) => {
 const verifyOtp = async (req, res) => {
     try {
         const { email, otp } = req.body;
+
+        // Validate inputs
+        if (!email || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and OTP are required'
+            });
+        }
+
         const user = await User.findOne({
             email,
-            otp,
             otpExpires: { $gt: Date.now() }
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired OTP'
+            });
         }
 
-        res.status(200).json({ success: true, message: 'OTP verified successfully' });
+        // Compare hashed OTP
+        const isOtpValid = await bcrypt.compare(otp, user.otp);
+
+        if (!isOtpValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid OTP'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'OTP verified successfully'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error verifying OTP', error: error.message });
+        console.error('Verify OTP error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error verifying OTP',
+            error: error.message
+        });
     }
 };
 
@@ -301,28 +362,64 @@ const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
 
+        // Validate inputs
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email, OTP, and new password are required'
+            });
+        }
+
+        // Validate password strength
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+
         const user = await User.findOne({
             email,
-            otp,
             otpExpires: { $gt: Date.now() }
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired OTP'
+            });
         }
 
+        // Verify hashed OTP
+        const isOtpValid = await bcrypt.compare(otp, user.otp);
 
+        if (!isOtpValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid OTP'
+            });
+        }
+
+        // Hash new password
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
 
-
+        // Clear OTP fields (invalidate OTP after use)
         user.otp = undefined;
         user.otpExpires = undefined;
         await user.save();
 
-        res.status(200).json({ success: true, message: 'Password reset successfully' });
+        res.status(200).json({
+            success: true,
+            message: 'Password reset successfully. You can now login with your new password.'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Error resetting password', error: error.message });
+        console.error('Reset password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error resetting password',
+            error: error.message
+        });
     }
 };
 

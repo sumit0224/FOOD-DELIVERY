@@ -173,6 +173,22 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           />
         </div>
 
+        {/* FORGOT PASSWORD - Only show in login mode */}
+        {isLogin && (
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                window.location.href = "/forgot-password";
+              }}
+              className="text-sm text-[#FF5200] hover:underline font-semibold"
+            >
+              Forgot Password?
+            </button>
+          </div>
+        )}
+
         {/* SUBMIT */}
         <button
           type="submit"

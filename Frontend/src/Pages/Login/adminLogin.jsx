@@ -114,17 +114,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="flex justify-between text-sm text-gray-500 mt-5">
-          <span className="cursor-pointer hover:underline">
-            Forgot password?
-          </span>
-
-          <Link to="/admin-signup">
-            <span className="text-[#FF5200] font-semibold cursor-pointer hover:underline">
-              Create account
-            </span>
-          </Link>
-        </div>
+        {/* Note: Admin accounts can only be created by existing admins */}
       </div>
     </div>
   );
